@@ -35,7 +35,7 @@ app.use("/auth", Auth)
 
 // Routes
 app.get("/", (req, res) => {
-  res.send("Hello, world!");
+  res.send("Server is Running!");
 });
 
 app.get("*", (req, res) => {
