@@ -7,7 +7,6 @@ export const CoordinatorDashboard = () => {
 
     const [jobs, setJobs] = useState([]);
     const [recruiters, setRecruiters] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         try {
@@ -78,13 +77,6 @@ export const CoordinatorDashboard = () => {
             </div>
         </div>
     )
-}
-
-function HandlerDeleteJob(id) {
-    console.log("delete job");
-}
-function HandlerUpdateJob(id) {
-    console.log("delete job");
 }
 
 function RenderTableRows({ job, recruiters }) {

@@ -1,19 +1,17 @@
-import React, { useEffect } from 'react'
-import { useState, useContext } from 'react'
+import { useContext } from 'react'
 import { Link } from 'react-router-dom'
-import { useForm, SubmitHandler } from "react-hook-form"
-import { ToastContainer, toast } from 'react-toastify';
+import { useForm } from "react-hook-form"
+import { toast } from 'react-toastify';
 import { LoginContext } from '../../ContextProvider/Context';
 import { useNavigate } from 'react-router-dom';
 
 export const Login = () => {
 
-    const { loginData, setLoginData, setUserRole } = useContext(LoginContext);
+    const { setLoginData, setUserRole } = useContext(LoginContext);
     const navigate = useNavigate();
     const {
         register,
         handleSubmit,
-        formState: { errors },
     } = useForm()
 
     const onSubmit = async (data) => {

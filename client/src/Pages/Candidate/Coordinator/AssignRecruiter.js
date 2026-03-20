@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
-import { useForm, SubmitHandler } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { useParams } from 'react-router-dom'
 
 export const AssignRecruiter = () => {
@@ -28,12 +28,11 @@ export const AssignRecruiter = () => {
         } catch (error) {
             console.log(error);
         }
-    }, []);
+    } );
 
     const {
         register,
         handleSubmit,
-        formState: { errors },
     } = useForm({
         defaultValues: {
             jobID: "",

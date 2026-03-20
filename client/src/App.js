@@ -1,11 +1,9 @@
 import {
   Routes,
   Route,
-  BrowserRouter as Router,
-  useNavigate,
 } from "react-router-dom";
 import "./App.css";
-import React, { useEffect } from "react";
+// import React, { useEffect } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import { Home } from "./Pages/Employer/Home";
 import { Navbar } from "./components/Navbar";
@@ -24,17 +22,16 @@ import { AssignRecruiter } from "./Pages/Candidate/Coordinator/AssignRecruiter";
 import { Footer } from "./components/Footer";
 import { AllPostedJobs } from "./components/AllPostedJobs";
 import { Dashboard } from "./Pages/Dashboard";
-import { useContext } from "react";
-import { LoginContext } from "./components/ContextProvider/Context";
+// import { useContext } from "react";
+// import { LoginContext } from "./components/ContextProvider/Context";
 import { UpdateJob } from "./Pages/Employer/UpdateJob";
 import { MyJobs } from "./Pages/Candidate/MyJobs";
 
 function App() {
-  const { loginData, setLoginData } = useContext(LoginContext);
+  // const { loginData, setLoginData } = useContext(LoginContext);
 
-  const { userRole } = useContext(LoginContext);
-  const navigate = useNavigate();
-  
+  // const { userRole } = useContext(LoginContext);
+  // const navigate = useNavigate();
 
   return (
     <div className="App">

@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
-import { useForm, SubmitHandler } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
@@ -9,7 +9,6 @@ export const Register = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors },
     } = useForm({
         defaultValues: {
             userName: "",
