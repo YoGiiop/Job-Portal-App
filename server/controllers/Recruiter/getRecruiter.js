@@ -3,7 +3,7 @@ import Recruiter from '../../models/Recruiter.js'
 const getRecruiter = async (req, res) => {
     try {
         const recID = req.params.id;
-        const recruiter = await Recruiter.findById("6673362cab92f179a717d0e3");
+        const recruiter = await Recruiter.findById(recID);
         if (!recruiter) {
             return res.status(404).json({ message: 'Recruiter not found' });
         }

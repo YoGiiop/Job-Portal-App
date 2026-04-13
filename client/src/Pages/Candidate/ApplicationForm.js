@@ -1,20 +1,23 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
-import { useForm, SubmitHandler } from "react-hook-form"
-import { Link, useParams } from 'react-router-dom'
+import { useForm } from "react-hook-form"
+import { useNavigate, useParams } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 export const ApplicationForm = () => {
 
     const { id } = useParams();
+    const navigate = useNavigate();
     const [job, setJob] = useState([]);
+    const [candidateId, setCandidateId] = useState("");
+    const [userRole, setUserRole] = useState("");
 
     const {
         register,
         handleSubmit,
-        formState: { errors },
     } = useForm({
         defaultValues: {
-            candidateID: "667336c6ab92f179a717d0ec",
+            candidateID: "",
             jobID: job._id,
             applicationStatus: "active",
             applicationForm: [{
@@ -28,62 +31,50 @@ export const ApplicationForm = () => {
         }
     })
 
-    const [redirect, setRedirect] = useState(false);
-
     useEffect(() => {
-        if (redirect) {
-            setTimeout(() => {
-                window.location.href = "/";
-            }, 200000);
+        const storedUser = JSON.parse(localStorage.getItem("user"));
+        const normalizedUser = Array.isArray(storedUser) ? storedUser[0] : storedUser;
+        if (normalizedUser && normalizedUser._id) {
+            setCandidateId(normalizedUser._id);
+            setUserRole(normalizedUser.role);
         }
-    }, [redirect]);
+    }, []);
 
-    const onSubmit = (data) => {
-        const newData = { ...data, jobID: id };
+    const onSubmit = async (data) => {
+        if (!candidateId) {
+            toast.error("Please login as candidate to apply");
+            return;
+        }
 
-        // send data to backend API
-        fetch(`${process.env.REACT_APP_API_URL}/application/post-application`, {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify(newData),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                console.log(result);
-                setRedirect(true);
+        if (userRole && userRole !== 'candidate') {
+            toast.error('Only candidate accounts can apply for jobs');
+            return;
+        }
+
+        const newData = { ...data, jobID: id, candidateID: candidateId, applicationStatus: "active" };
+
+        try {
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/application/post-application`, {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify(newData),
             });
 
-        fetch(`${process.env.REACT_APP_API_URL}/jobs/update-job-by-candidate`, {
-            method: "PUT",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-                jobID: id,
-                candidateID: "667336c6ab92f179a717d0ec",
-                status: "active"                
-            }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                // Working fine
-                console.log(result);
-                setRedirect(true);
-            });
+            const result = await response.json();
 
-        fetch(`${process.env.REACT_APP_API_URL}/users/update-user-by-candidate`, {
-            method: "PUT",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-                jobID: id,
-                candidateID: "667336c6ab92f179a717d0ec",
-                status: "active"                
-            }),
-        })
-            .then((res) => res.json())
-            .then((result) => {
-                // Applications empty
-                console.log(result);
-                setRedirect(true);
-            });
+            if (!response.ok) {
+                toast.error(result?.message || "Failed to apply to job");
+                return;
+            }
+
+            toast.success("Applied to job successfully");
+            setTimeout(() => {
+                navigate('/my-jobs');
+            }, 800);
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed to apply to job");
+        }
     };
 
     useEffect(() => {
@@ -92,7 +83,7 @@ export const ApplicationForm = () => {
         } catch (error) {
             console.log(error);
         }
-    }, []);
+    }, [id]);
 
     return (
         <div className='max-w-scren-2xl w-full md:w-4/6 lg:w-1/2 container mt-2 mx-auto xl:px-24 px-4 '>
@@ -114,7 +105,7 @@ export const ApplicationForm = () => {
                                 <RenderQuestion key={index} question={question} />
                             ))} */}
                             {job.applicationForm && job.applicationForm.question.map((question, index) => (
-                                <RenderQuestion {...register(`applicationForm.${index}.question`)} key={index} index={index} question={question} register={register} />
+                                <RenderQuestion key={index} index={index} question={question} register={register} />
 
                             ))}
 
@@ -135,15 +126,14 @@ function RenderQuestion({ index, question, register }) {
     return (
         <div className='grid grid-cols-1 md:grid-cols-2 items-center pt-2 md:my-0'>
             <label className='block mt-2 m-1 text-sm' >{index + 1}. {question}</label>
-            <div className='grid grid-cols-2 items-center justify-items-center'>
-                <div className='flex'>
-                    <input {...register(`applicationForm.${index}.answer`, { required: true })} type="radio" value="Yes" className='mx-2' />
-                    <p>Yes</p>
-                </div>
-                <div className='flex'>
-                    <input {...register(`applicationForm.${index}.answer`, { required: true })} type="radio" value="No" className='mx-2' />
-                    <p>No</p>
-                </div>
+            <input type='hidden' value={question} {...register(`applicationForm.${index}.question`)} />
+            <div>
+                <input
+                    {...register(`applicationForm.${index}.answer`, { required: true })}
+                    type='text'
+                    placeholder='Write your answer'
+                    className='create-job-input placeholder:text-xs md:placeholder:text-sm'
+                />
             </div>
         </div>
     );

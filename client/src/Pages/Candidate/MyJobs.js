@@ -1,44 +1,72 @@
 import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom';
 
 export const MyJobs = () => {
 
     const tableHeaderCss = "px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
     
-    const applications = [
-        {
-            jobTitle: "Web Developer",
-            employmentType: "Full Time",
-            location: "Hyderabad"
-        },
-        {
-            jobTitle: "Data Analyst",
-            employmentType: "Part Time",
-            location: "Mumbai"
-        },
-        {
-            jobTitle: "Full Stack Developer",
-            employmentType: "Full Time",
-            location: "Delhi"
-        }
-    ]
+    const [applications, setApplications] = useState([]);
     const [loginData, setLoginData] = useState();
     
     useEffect(() => {
         let token = localStorage.getItem("user");
         const user = JSON.parse(token);
-        setLoginData(user[0])
-        console.log(user);
+        const normalizedUser = Array.isArray(user) ? user[0] : user;
+        setLoginData(normalizedUser)
     }, [])
 
     useEffect(() => {
+        const loadApplications = async () => {
+            if (!loginData?._id) {
+                return;
+            }
 
-        try {
-            
-        } catch (error) {
-            console.log(error);
-        }
-    }, []);
+            try {
+                const [userRes, jobsRes, applicationsRes] = await Promise.all([
+                    fetch(`${process.env.REACT_APP_API_URL}/users/user/${loginData._id}`),
+                    fetch(`${process.env.REACT_APP_API_URL}/jobs/all-jobs`),
+                    fetch(`${process.env.REACT_APP_API_URL}/application/all-application/`)
+                ]);
+
+                const [userData, jobsData, applicationsData] = await Promise.all([
+                    userRes.json(),
+                    jobsRes.json(),
+                    applicationsRes.json()
+                ]);
+
+                let normalizedApplications = (userData.applications || []).map((application) => {
+                    const matchedJob = jobsData.find((job) => String(job._id) === String(application.jobId));
+
+                    return {
+                        jobTitle: matchedJob?.jobTitle || 'Job not found',
+                        employmentType: matchedJob?.employmentType || '-',
+                        location: matchedJob?.location || '-',
+                        status: application.status || 'active'
+                    };
+                });
+
+                if (normalizedApplications.length === 0) {
+                    normalizedApplications = (applicationsData || [])
+                        .filter((item) => String(item.candidateID) === String(loginData._id))
+                        .map((item) => {
+                            const matchedJob = jobsData.find((job) => String(job._id) === String(item.jobID));
+
+                            return {
+                                jobTitle: matchedJob?.jobTitle || 'Job not found',
+                                employmentType: matchedJob?.employmentType || '-',
+                                location: matchedJob?.location || '-',
+                                status: item.applicationStatus || 'active'
+                            };
+                        });
+                }
+
+                setApplications(normalizedApplications);
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        loadApplications();
+    }, [loginData]);
 
     return (
         <div className='max-w-screen-2xl container mx-auto xl:px-24 px-4'>
@@ -71,10 +99,12 @@ export const MyJobs = () => {
                                         </thead>
 
                                         <tbody>
-                                            {   applications ?
+                                            {   applications.length > 0 ?
                                                 applications.map((application, key) => <RenderTableRows key={key} application={application} />)
                                                 :
-                                                <p>No shortlisted candidates found</p>
+                                                <tr>
+                                                    <td className='p-4 text-center' colSpan={4}>No applications found</td>
+                                                </tr>
                                             }
                                         </tbody>
 
@@ -106,7 +136,7 @@ function RenderTableRows({application}){
                 {application.location}
             </td>
             <td className={`${tableDataCss} font-bold hidden md:table-cell`}>
-                Active
+                {application.status}
             </td>
             
         </tr>

@@ -21,7 +21,6 @@ import { ApplicationForm } from "./Pages/Candidate/ApplicationForm";
 import { AssignRecruiter } from "./Pages/Candidate/Coordinator/AssignRecruiter";
 import { Footer } from "./components/Footer";
 import { AllPostedJobs } from "./components/AllPostedJobs";
-import { Dashboard } from "./Pages/Dashboard";
 // import { useContext } from "react";
 // import { LoginContext } from "./components/ContextProvider/Context";
 import { UpdateJob } from "./Pages/Employer/UpdateJob";
@@ -62,7 +61,6 @@ function App() {
             path="/coordinator/review"
             element={<CoordinatorDashboard />}
           />
-          <Route path="/dash" element={<Dashboard />} />
           <Route path="/all-posted-jobs" element={<AllPostedJobs />} />
           <Route path="/update-job/:id" element={<UpdateJob />} />
           <Route path="/my-jobs/" element={<MyJobs />} />

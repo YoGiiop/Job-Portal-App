@@ -8,7 +8,6 @@ export const AllJobs = () => {
     const tableHeaderCss = "px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
     
     const [jobs, setJobs] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
 
     useEffect( ()=>{
         try {
@@ -22,7 +21,7 @@ export const AllJobs = () => {
             console.error("Error fetching jobs:", error);
         }
 
-    }, [jobs] )
+    }, [] )
     return (
         <div className='max-w-screen-2xl container mx-auto xl:px-24 px-4'>
 
@@ -86,6 +85,21 @@ function HandlerDeleteJob(id){
 
 
 function RenderTableRows({job}){
+    const formatSalaryLpa = (salary) => {
+        const numericSalary = Number(salary);
+
+        if (Number.isNaN(numericSalary)) {
+            return `${salary} LPA`;
+        }
+
+        if (numericSalary >= 100000) {
+            const lpa = (numericSalary / 100000).toFixed(1).replace(/\.0$/, '');
+            return `${lpa} LPA`;
+        }
+
+        return `${numericSalary} LPA`;
+    };
+
     const tableDataCss = "border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4"
     return (
 
@@ -94,19 +108,19 @@ function RenderTableRows({job}){
                 {job.jobTitle}
             </th>
             <td className={`${tableDataCss} hidden md:table-cell`}>
-                {job.location}
+                {formatSalaryLpa(job.salary)}
             </td>
             <td className={`${tableDataCss} hidden md:table-cell`}>
-                {job.salary}
+                {job.location}
             </td>
             <td className={`flex justify-between ${tableDataCss}`}>
-                <button>
-
-                    <box-icon name='edit'/>
-                </button>
-                <button>
-                    
-                    <box-icon name='trash' onClick={() => HandlerDeleteJob(job._id)} />
+                <Link to={`/update-job/${job._id}`}>
+                    <button>
+                        <box-icon name='edit'/>
+                    </button>
+                </Link>
+                <button onClick={() => HandlerDeleteJob(job._id)}>
+                    <box-icon name='trash' />
                 </button>
             </td>
         </tr>

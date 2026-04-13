@@ -8,7 +8,6 @@ export const AssignRecruiter = () => {
     const { id } = useParams();
     const [job, setJob] = useState();
     const [recruiters, setRecruiters] = useState([]);
-    const [selectedRecruiter, setSelectedRecruiter] = useState();
 
     const placeholderQuestions = [
         "Willing to relocate?",
@@ -19,16 +18,25 @@ export const AssignRecruiter = () => {
     ]
 
     useEffect(() => {
-        try {
-            fetch(`${process.env.REACT_APP_API_URL}/jobs/current-job/${id}`).then((res) => res.json()).then((data) => setJob(data))
-            fetch(`${process.env.REACT_APP_API_URL}/users/all-users`).then((res) => res.json()).then((data) => {
-                let recruiterData = data.filter((user) => user.isAssigned === false && user.role === "recruiter");
+        const loadData = async () => {
+            try {
+                const [jobRes, usersRes] = await Promise.all([
+                    fetch(`${process.env.REACT_APP_API_URL}/jobs/current-job/${id}`),
+                    fetch(`${process.env.REACT_APP_API_URL}/users/all-users`)
+                ]);
+
+                const [jobData, userData] = await Promise.all([jobRes.json(), usersRes.json()]);
+                setJob(jobData);
+
+                const recruiterData = userData.filter((user) => user.isAssigned === false && user.role === "recruiter");
                 setRecruiters(recruiterData);
-            })
-        } catch (error) {
-            console.log(error);
-        }
-    } );
+            } catch (error) {
+                console.log(error);
+            }
+        };
+
+        loadData();
+    }, [id]);
 
     const {
         register,
@@ -41,39 +49,28 @@ export const AssignRecruiter = () => {
         }
     })
 
-    const onSubmit = (data) => {
-        console.log("Form submitted");
-        const newData = {...data, jobID:id};
-        console.log(newData);
-        fetch(`${process.env.REACT_APP_API_URL}/recruiter/post-recruiter`, {
-            method: "POST",
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify(newData)
-        })
-        .then((res) => res.json())
-        .then((result) => {
-            console.log(result);
-        })
+    const onSubmit = async (data) => {
+        try {
+            const newData = { ...data, jobID: id };
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/recruiter/assign-recruiter`, {
+                method: "POST",
+                headers: { 'content-type': 'application/json' },
+                body: JSON.stringify(newData)
+            });
 
-        console.log(data.recruiterID);
-
-        fetch(`${process.env.REACT_APP_API_URL}/users/user/${data.recruiterID}`).then((res) => res.json()).then((data) => {
-            let recruiterData = data
-            setSelectedRecruiter(recruiterData);
-            // console.log(data);
-        })
-        
-        fetch(`${process.env.REACT_APP_API_URL}/users/update-user/${data.recruiterID}`, {
-            method: "PUT",
-            headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({
-                ...selectedRecruiter, isAssigned:true
-            })
-        })
-        .then((res) => res.json())
-        .then((result) => {
+            const result = await response.json();
             console.log(result);
-        })
+
+            if (!response.ok) {
+                alert(result.message || "Failed to assign recruiter");
+                return;
+            }
+
+            alert("Recruiter assigned successfully");
+        } catch (error) {
+            console.log(error);
+            alert("Something went wrong while assigning recruiter");
+        }
     }
 
     // DYNAMIC CANDIDATE FORM QUESTION
@@ -179,7 +176,7 @@ export const AssignRecruiter = () => {
                                     </div>
                                 ))}
                             </div>
-                            <button onClick={addQuestion} className={`${questionSize === 4 ? `hidden` : ``} block border border-black bg-transparent text-black text-xs md:text-md py-3 px-12 md:px-16 rounded-md mt-4 md:mt-8 mx-auto`}>Add More Questions</button>
+                            <button type='button' onClick={addQuestion} className={`${questionSize === 4 ? `hidden` : ``} block border border-black bg-transparent text-black text-xs md:text-md py-3 px-12 md:px-16 rounded-md mt-4 md:mt-8 mx-auto`}>Add More Questions</button>
                         </div>
                     </div>
 

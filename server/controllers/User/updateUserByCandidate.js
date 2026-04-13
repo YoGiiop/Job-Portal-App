@@ -4,21 +4,25 @@ const updateUserByCandidate = async (req, res) => {
     try {
         const { jobID, candidateID, status } = req.body;
 
-        // Find the job by jobId
-        console.log("Update user by candidate");
-        console.log(req.body);
+        const user = await User.findById(candidateID);
 
-        const updatedUser = await User.findByIdAndUpdate(
-            candidateID,
-            { $push: { applications: { jobID:jobID, candidateID:candidateID, status:status } } },
-            { new: true } // To return the updated document
-        );
-
-        if (!updatedUser) {
-            return res.status(404).json({ error: 'Job not found' });
+        if (!user) {
+            return res.status(404).json({ error: 'Candidate not found' });
         }
 
-        res.status(200).json(updatedUser);
+        const existingApplication = user.applications.find(
+            (application) => application.jobId.toString() === jobID.toString()
+        );
+
+        if (existingApplication) {
+            existingApplication.status = status;
+        } else {
+            user.applications.push({ jobId: jobID, status });
+        }
+
+        await user.save();
+
+        res.status(200).json(user);
     } catch (error) {
         res.status(500).json({ error: 'Failed to update job by candidate' });
     }

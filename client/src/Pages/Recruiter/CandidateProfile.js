@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useForm, SubmitHandler, set } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 export const CandidateProfile = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors },
     setValue,
   } = useForm({
     defaultValues: {
@@ -30,137 +29,83 @@ export const CandidateProfile = () => {
   });
 
   const { id } = useParams();
-  const currRecruiterID = "66733676ab92f179a717d0e9";
-  // const index = id;/
-  // const id = "667478f128091d0d096071ea"
   const [application, setApplicaton] = useState();
   const [candidate, setCandidate] = useState();
   const [recruiter, setRecruiter] = useState();
   const [job, setJob] = useState();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    console.log(id);
-    try {
-      setApplicaton({
-        _id: "6676d1519d5f4ea7521cf13f",
-        jobID: "6676cb664e5a14c58a721384",
-        candidateID: "667656750d96db510a5facbf",
-        userName: "Puneet",
-        applicationStatus: "active",
-        applicationForm: [
-          {
-            question: "",
-            answer: "",
-            _id: "6675433b6fc8b5c030039b45",
-          },
-        ],
-        candidateFeedback: [
-          {
-            question: "Willing to relocate?",
-            answer: "Yes",
-            _id: "6675433b6fc8b5c030039b46",
-          },
-          {
-            _id: "6676d5754e5a14c58a721744",
-            question: "Expertise in python?",
-            answer: "Yes",
-          },
-        ],
-        __v: 0,
-      });
-
-      setCandidate({
-        _id: "667656750d96db510a5facbf",
-        userName: "Puneet",
-        userEmail: "puneet@gmail.com",
-        userPassword:
-          "$2a$10$6bLhTvaB/1dCC/EJyH/4S.kQelcEHFQA48vQ6lc.zTeYtzSKhQvOS",
-        gender: "Male",
-        address: "Uttar Pradesh",
-        role: "candidate",
-        applications: [],
-        __v: 0,
-      });
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
-
-  useEffect(() => {
-    console.log(id);
-    setRecruiter(
-      {
-        _id: "6676d2ca4e5a14c58a7216ed",
-        jobID: "6676cb664e5a14c58a721384",
-        recruiterID: "6676b5f64e5a14c58a720ebb",
-        feedbackForm: [
-          "Willing to relocate?",
-          "Sufficient Experience?",
-          "Require sponsorship?",
-          "Good fit for the role?",
-        ],
-        __v: 0,
-      },
-      {
-        _id: "6676d2ca4e5a14c58a7216f2",
-        jobID: "6676cb664e5a14c58a721384",
-        recruiterID: "6676b5f64e5a14c58a720ebb",
-        feedbackForm: [
-          "Willing to relocate?",
-          "Sufficient Experience?",
-          "Require sponsorship?",
-          "Good fit for the role?",
-        ],
-        __v: 0,
+    const loadData = async () => {
+      const loggedUser = JSON.parse(localStorage.getItem("user"));
+      if (!loggedUser?._id) {
+        setLoading(false);
+        return;
       }
-    );
-  }, []);
 
-  useEffect(() => {
-    setJob({
-      applicationForm: {
-        question: [
-          "Industry 2+ YOE",
-          "Willing to relocate?",
-          "Require visa sponsorship?",
-        ],
-        answer: ["Yes", "Yes", "No"],
-      },
-      _id: "6676cb664e5a14c58a721384",
-      jobID: "2vek3boglxq4qr35",
-      jobTitle: "DevOps Engineer",
-      employmentType: "Full Time",
-      location: "Mumbai",
-      salary: "16.8",
-      description:
-        "A Dev-Ops engineer is an IT generalist who should have a wide-ranging knowledge of both development and operations, including coding, infrastructure management, system administration, and Dev-Ops tool chains.",
-      applicants: [],
-      __v: 0,
-    });
-  }, [recruiter]);
+      try {
+        const [allRecruitersRes, candidateRes] = await Promise.all([
+          fetch(`${process.env.REACT_APP_API_URL}/recruiter/all-recruiter`),
+          fetch(`${process.env.REACT_APP_API_URL}/users/user/${id}`),
+        ]);
+
+        const [allRecruiters, candidateData] = await Promise.all([
+          allRecruitersRes.json(),
+          candidateRes.json(),
+        ]);
+
+        const assignedRecruiter = allRecruiters.find(
+          (item) => item.recruiterID === loggedUser._id
+        );
+
+        if (!assignedRecruiter) {
+          setLoading(false);
+          return;
+        }
+
+        const [jobRes, applicationsRes] = await Promise.all([
+          fetch(`${process.env.REACT_APP_API_URL}/jobs/current-job/${assignedRecruiter.jobID}`),
+          fetch(`${process.env.REACT_APP_API_URL}/application/all-application/`),
+        ]);
+
+        const [jobData, applicationsData] = await Promise.all([
+          jobRes.json(),
+          applicationsRes.json(),
+        ]);
+
+        const candidateApplication = applicationsData.find(
+          (item) => item.candidateID === id && item.jobID === assignedRecruiter.jobID
+        );
+
+        setCandidate(candidateData);
+        setRecruiter(assignedRecruiter);
+        setJob(jobData);
+        setApplicaton(candidateApplication);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [id]);
 
   const onSubmit = (data) => {
-
-    console.log("Form raw data before processing:", data);
-
-    let newData = data;
-    if (application && candidate) {
-      newData = {
-        ...data,
-        _id: application._id,
-        candidateID: candidate._id,
-        jobID: job._id,
-        applicationStatus: data.applicationStatus,
-        candidateFeedback: [
-          ...recruiter.feedbackForm.map((q, index) => ({
-            answer: data.candidateFeedback[index].answer,
-            question: q,
-          })),
-        ],
-      };
+    if (!application || !candidate || !job || !recruiter) {
+      return;
     }
-    
-    console.log("Final data being sent to API:", newData);
+
+    const newData = {
+      candidateID: candidate._id,
+      jobID: job._id,
+      applicationStatus: data.applicationStatus,
+      applicationForm: application.applicationForm || [],
+      candidateFeedback: recruiter.feedbackForm.map((q, index) => ({
+        answer: data?.candidateFeedback?.[index]?.answer || "",
+        question: q,
+      })),
+    };
 
     fetch(`${process.env.REACT_APP_API_URL}/application/post-application`, {
       method: "POST",
@@ -170,10 +115,9 @@ export const CandidateProfile = () => {
       .then((res) => res.json())
       .then((result) => {
         console.log(result);
+        window.location.href = '/recruiter/review';
       });
   };
-
-  const apps = [{}];
 
   const handleShortlistOrReject = (status) => {
     setValue("applicationStatus", status);
@@ -208,7 +152,7 @@ export const CandidateProfile = () => {
                           Gender: {candidate.gender}
                         </p>
                         <p className="text-sm md:text-base text-justify ">
-                          Address: {candidate.location}
+                          Address: {candidate.address}
                         </p>
                       </div>
                     </div>
@@ -239,8 +183,7 @@ export const CandidateProfile = () => {
                   <h2 className="mt-2 mb-2 font-bold">Application Form (R1)</h2>
                   {application && (
                     <div className="px-1">
-                      {apps.applicationForm &&
-                        application.applicationForm.map((question, index) => (
+                      {application.applicationForm.map((question, index) => (
                           <div key={index}>
                             <p className="text-sm md:text-base text-justify">
                               Q{index + 1}: {question.question}
@@ -303,6 +246,9 @@ export const CandidateProfile = () => {
           </div>
         </form>
 
+        {loading && <p className="text-center mt-4">Loading candidate review...</p>}
+        {!loading && !application && <p className="text-center mt-4">No application found for this candidate in your assigned job.</p>}
+
         {/* <div className='text-center'>
                     <p className='hover:underline text-xs md:text-sm mt-8'>By applying to above job, you agree to our terms and conditions.</p>
                 </div> */}
@@ -311,36 +257,21 @@ export const CandidateProfile = () => {
   );
 };
 
-function RenderQuestion({ index, question, setValue, register }) {
+function RenderQuestion({ index, question, register }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 items-center pt-2 md:my-0">
       <label className="block mt-2 m-1 text-sm">
         {index + 1}. {question}
       </label>
-      {/* <input {...register(`candidateFeedback.${index}.question`)} type="hidden" value={question} /> */}
-      <div className="grid grid-cols-2 items-center justify-items-center">
-        <div className="flex">
-          <input
-            {...register(`candidateFeedback.${index}.answer`, {
-              required: true,
-            })}
-            type="radio"
-            value="Yes"
-            className="mx-2"
-          />
-          <p>Yes</p>
-        </div>
-        <div className="flex">
-          <input
-            {...register(`candidateFeedback.${index}.answer`, {
-              required: true,
-            })}
-            type="radio"
-            value="No"
-            className="mx-2"
-          />
-          <p>No</p>
-        </div>
+      <div>
+        <textarea
+          {...register(`candidateFeedback.${index}.answer`, {
+            required: true,
+          })}
+          placeholder="Write your feedback"
+          rows={3}
+          className="create-job-input resize-none"
+        />
       </div>
     </div>
   );

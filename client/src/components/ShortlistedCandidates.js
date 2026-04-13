@@ -5,55 +5,49 @@ export const ShortlistedCandidates = () => {
 
     const tableHeaderCss = "px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
     
-    const [jobs, setJobs] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [shortlistApplication, setShortlistApplication] = useState()
-    const [shortlistCandidate, setShortlistCandidate] = useState()
+    const [shortlistedRows, setShortlistedRows] = useState([]);
 
     useEffect(() => {
-
-        try {
-            fetch(`${process.env.REACT_APP_API_URL}/application/all-application/`)
-            .then((res) => res.json())
-            .then((data) => {
-                const filterData = data.filter(item => item.applicationStatus === "shortlist"); 
-                setShortlistApplication(filterData);
-                console.log(filterData);
-            })
-        } catch (error) {
-            console.log(error);
-        }
-    }, []);
-
-    useEffect(() => {
-        function fetchData(){
+        const fetchData = async () => {
             try {
-                fetch(`${process.env.REACT_APP_API_URL}/users/all-users/`)
-                .then((res) => res.json())
-                .then((data) => {
-                    const filterData = data.filter(user => {
-                        return shortlistApplication.some(application => application.candidateID === user._id)
-                    }); 
-                    setShortlistCandidate(filterData);
-                    console.log(filterData);
-                })
-                fetch(`${process.env.REACT_APP_API_URL}/jobs/all-jobs/`)
-                .then((res) => res.json())
-                .then((data) => {
-                    const filterData = data.filter(job => {
-                        return shortlistApplication.some(application => application.jobID === job._id)
-                    }); 
-                    setJobs(filterData);
-                    console.log(filterData);
-                })
+                const [applicationsRes, usersRes, jobsRes] = await Promise.all([
+                    fetch(`${process.env.REACT_APP_API_URL}/application/all-application/`),
+                    fetch(`${process.env.REACT_APP_API_URL}/users/all-users/`),
+                    fetch(`${process.env.REACT_APP_API_URL}/jobs/all-jobs/`)
+                ]);
+
+                const [applications, users, jobs] = await Promise.all([
+                    applicationsRes.json(),
+                    usersRes.json(),
+                    jobsRes.json()
+                ]);
+
+                const shortlistedApplications = applications.filter((item) => item.applicationStatus === 'shortlist');
+                const rows = shortlistedApplications
+                    .map((application) => {
+                        const candidate = users.find((user) => user._id === application.candidateID);
+                        const job = jobs.find((item) => item._id === application.jobID);
+
+                        if (!candidate || !job) {
+                            return null;
+                        }
+
+                        return {
+                            candidate,
+                            job,
+                            application
+                        };
+                    })
+                    .filter(Boolean);
+
+                setShortlistedRows(rows);
             } catch (error) {
                 console.log(error);
             }
-        }
-        if(shortlistApplication){
-            fetchData();
-        }
-    }, [shortlistApplication]);
+        };
+
+        fetchData();
+    }, []);
 
     return (
         <div className='max-w-screen-2xl container mx-auto xl:px-24 px-4'>
@@ -86,10 +80,10 @@ export const ShortlistedCandidates = () => {
                                         </thead>
 
                                         <tbody>
-                                            {shortlistCandidate && jobs && shortlistApplication?
-                                             shortlistCandidate.map((candidate, key) => <RenderTableRows job={jobs} key={key} candidate={candidate} />)
+                                            {shortlistedRows.length > 0 ?
+                                             shortlistedRows.map((row, key) => <RenderTableRows key={key} row={row} />)
                                                 :
-                                                <p>No shortlisted candidates found</p>
+                                                <tr><td colSpan={4} className='p-4 text-center'>No shortlisted candidates found</td></tr>
                                             }
                                         </tbody>
 
@@ -105,9 +99,8 @@ export const ShortlistedCandidates = () => {
     )
 }
 
-function RenderTableRows({candidate, job}){
-    console.log("called");
-    console.log(job);
+function RenderTableRows({ row }){
+    const { candidate, job } = row;
     const tableDataCss = "border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4"
     return (
         
@@ -123,7 +116,7 @@ function RenderTableRows({candidate, job}){
                 Shortlisted
             </td>
             <td className={`flex justify-between ${tableDataCss}`}>
-                <Link to={`/shortlist/details/${candidate._id}/${job[0]._id}`}>
+                <Link to={`/shortlist/details/${candidate._id}/${job._id}`}>
                     <button className='block bg-primary text-white mx-auto text-md py-2  px-2 md:px-6 rounded-md'>Details</button>
                 </Link>
             </td>

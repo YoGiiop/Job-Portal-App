@@ -7,14 +7,28 @@ export const CoordinatorDashboard = () => {
 
     const [jobs, setJobs] = useState([]);
     const [recruiters, setRecruiters] = useState([]);
+    const [assignedRecruitersByJob, setAssignedRecruitersByJob] = useState({});
 
     useEffect(() => {
         try {
             fetch(`${process.env.REACT_APP_API_URL}/jobs/all-jobs`).then((res) => res.json()).then((data) => setJobs(data))
 
             fetch(`${process.env.REACT_APP_API_URL}/users/all-users`).then((res) => res.json()).then((data) => {
-                let recruiterData = data.filter((user) => user.userType === 1 );
+                let recruiterData = data.filter((user) => user.role === 'recruiter');
                 setRecruiters(recruiterData);
+
+                fetch(`${process.env.REACT_APP_API_URL}/recruiter/all-recruiter`).then((res) => res.json()).then((assignedData) => {
+                    const map = {};
+
+                    assignedData.forEach((assignment) => {
+                        const assignedUser = recruiterData.find((user) => user._id === assignment.recruiterID);
+                        if (assignedUser) {
+                            map[assignment.jobID] = assignedUser.userName;
+                        }
+                    });
+
+                    setAssignedRecruitersByJob(map);
+                });
             })
 
         } catch (error) {
@@ -51,20 +65,23 @@ export const CoordinatorDashboard = () => {
                                     </div>
                                 </div>
 
-                                <div className="block w-full overflow-x-hidden">
-                                    <table className="items-center bg-transparent w-full border-collapse ">
+                                <div className="block w-full overflow-x-auto">
+                                    <table className="items-center bg-transparent w-full border-collapse min-w-[900px]">
                                         <thead>
                                             <tr>
                                                 <th className={tableHeaderCss}>Job Title</th>
                                                 <th className={`${tableHeaderCss} hidden md:table-cell`}>Type</th>
                                                 <th className={`${tableHeaderCss} hidden md:table-cell`}>Location</th>
+                                                <th className={`${tableHeaderCss} hidden md:table-cell`}>Applicants</th>
+                                                <th className={`${tableHeaderCss} hidden md:table-cell`}>Assigned Recruiter</th>
+                                                <th className={`${tableHeaderCss} hidden md:table-cell`}>Recruiters</th>
                                                 <th className={tableHeaderCss}>Assign</th>
                                                 <th className={tableHeaderCss}></th>
                                             </tr>
                                         </thead>
 
                                         <tbody>
-                                            {jobs.map((job, key) => <RenderTableRows key={key} job={job} recruiters={recruiters}/>)}
+                                            {jobs.map((job, key) => <RenderTableRows key={key} job={job} recruiters={recruiters} assignedRecruitersByJob={assignedRecruitersByJob}/>)}
                                         </tbody>
 
                                     </table>
@@ -79,7 +96,7 @@ export const CoordinatorDashboard = () => {
     )
 }
 
-function RenderTableRows({ job, recruiters }) {
+function RenderTableRows({ job, recruiters, assignedRecruitersByJob }) {
     // console.log("called");
     console.log(recruiters);
 
@@ -87,7 +104,7 @@ function RenderTableRows({ job, recruiters }) {
     return (
 
         <tr>
-            <th className={`${tableDataCss} text-left text-blueGray-700 px-3 md:px-6`}>
+            <th className={`${tableDataCss} text-left text-blueGray-700 px-3 md:px-6 max-w-[180px] truncate`} title={job.jobTitle}>
                 {job.jobTitle}
             </th>
             <td className={`${tableDataCss} hidden md:table-cell`}>
@@ -97,11 +114,22 @@ function RenderTableRows({ job, recruiters }) {
                 {job.location}
             </td>
             <td className={`${tableDataCss} hidden md:table-cell`}>
+                {job?.applicants?.length || 0}
+            </td>
+            <td className={`${tableDataCss} hidden md:table-cell max-w-[180px] truncate`} title={assignedRecruitersByJob[job._id] || 'Not assigned'}>
+                {assignedRecruitersByJob[job._id] || 'Not assigned'}
+            </td>
+            <td className={`${tableDataCss} hidden md:table-cell`}>
                 <div>
                 {/* {...register("userType", { required: true })}  */}
-                    <select className=''>
+                    <select className='max-w-[180px] w-full border rounded px-2 py-1'>
+                        {recruiters.length === 0 && (
+                            <option value=''>No recruiters found</option>
+                        )}
                         {recruiters.map((recruiter, index) => (
-                            <option key={index} value={recruiter.id}>{recruiter.userName}</option>
+                            <option key={index} value={recruiter._id}>
+                                {recruiter.userName} {recruiter.isAssigned ? '(Assigned)' : '(Available)'}
+                            </option>
                         ))}
                     </select>
                 </div>

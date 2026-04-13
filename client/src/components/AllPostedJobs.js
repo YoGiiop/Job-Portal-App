@@ -27,8 +27,27 @@ export const AllPostedJobs = () => {
 }
 
 function Card({ job }) {
+    const formatSalaryLpa = (salary) => {
+        const numericSalary = Number(salary);
+
+        if (Number.isNaN(numericSalary)) {
+            return salary;
+        }
+
+        if (numericSalary >= 100000) {
+            const lpa = (numericSalary / 100000).toFixed(1).replace(/\.0$/, '');
+            return `${lpa} LPA`;
+        }
+
+        return `${numericSalary} LPA`;
+    };
+
+    const shortDescription = job.description?.length > 120
+        ? `${job.description.slice(0, 120)}...`
+        : job.description;
+
     return (
-        <div className='border shadow-lg card'>
+        <Link to={`/current-job/${job._id}`} className='block border shadow-lg card cursor-pointer'>
             {/* Card Header */}
             <div className='flex items-center gap-3'>
                 <div>
@@ -44,19 +63,17 @@ function Card({ job }) {
                 </div>
             </div>
             <div>
-                <p className='text-sm py-4'>{job.description}</p>
+                <p className='text-sm py-4'>{shortDescription}</p>
             </div>
             {/* Footer - apply now and location */}
             <div className='flex justify-between items-center'>
                 <div className='flex justify-center items-center'>
-                    <box-icon size='19px' name='pin'></box-icon>
-                    <span className='pl-2'>{job.location} </span>
+                    <box-icon size='19px' name='wallet'></box-icon>
+                    <span className='pl-2'>{formatSalaryLpa(job.salary)} </span>
                 </div>
-                <Link to={`/current-job/${job._id}`}>
-                    <button className='hidden lg:block bg-primary text-white text-sm py-1 px-4 rounded-md'>Apply Now</button>
-                </Link>
+                <span className='hidden lg:block bg-primary text-white text-sm py-1 px-4 rounded-md'>Apply Now</span>
                             
             </div>
-        </div>
+        </Link>
     )
 }

@@ -1,4 +1,5 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 import { OurCompanies } from './OurCompanies'
 
 export const Hero = () => {
@@ -16,7 +17,9 @@ export const Hero = () => {
           <div>
             <h1 className='text-5xl font-bold text-primary mb-3'>Find your job today!</h1>
             <p className='text-lg text-black mb-8'>Lorem ipsum lorem ipsum lorem ipsum</p>
-            <button className='bg-secondary text-white py-3 px-12 rounded-md'>Get Started</button>
+            <Link to='/all-posted-jobs'>
+              <button className='bg-secondary text-white py-3 px-12 rounded-md'>Get Started</button>
+            </Link>
 
           </div>
 

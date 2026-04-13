@@ -38,7 +38,8 @@ export const JobDetails = () => {
     useEffect(() => {
         let token = localStorage.getItem("user");
         const user = JSON.parse(token);
-        setLoginData(user)
+        const normalizedUser = Array.isArray(user) ? user[0] : user;
+        setLoginData(normalizedUser)
         console.log(user);
     }, [])
 
@@ -92,16 +93,11 @@ export const JobDetails = () => {
 
     const onSubmit = (data) => {
         console.log(data);
-        // fetch(`${process.env.REACT_APP_API_URL}/upload/resume/${applicants._id}`, {
-        //     method: "POST",
-        //     headers: { "content-type": "application/json" },
-        //     body: JSON.stringify(data),
-        // })
-        //     .then((res) => res.json())
-        //     .then((result) => {
-        //         console.log(result);
-        //     });
     }
+
+    const isAlreadyApplied = job && loginData?._id
+        ? job.applicants?.some((item) => String(item.applicant) === String(loginData._id))
+        : false;
 
     return (
         <div className='max-w-scren-2xl  w-full md:w-5/6 lg:w-6/8 container mt-2 mx-auto xl:px-24 px-4 '>
@@ -163,25 +159,16 @@ export const JobDetails = () => {
                         </div>
 
                         {
-                            job && applicants &&
-                                job.applicants.some(jobApplicant => {
-                                    applicants.some(app => {
-
-                                        return jobApplicant.applicant === app._id
-                                    })
-                                }) ?
-                                <Link to={`/application-form/${job._id}`}>
+                            job && isAlreadyApplied ?
+                                <div className='flex justify-center'>
+                                    <button type='button' disabled className='block bg-gray-500 text-white text-md py-2 px-12 md:px-16 rounded-md'>Already Applied</button>
+                                </div>
+                                :
+                                <Link to={`/application-form/${job?._id}`}>
                                     <div className='flex justify-center'>
-                                        <button className='block bg-primary text-white text-md py-2 px-12 md:px-16 rounded-md'>Apply Now</button>
+                                        <button type='button' className='block bg-primary text-white text-md py-2 px-12 md:px-16 rounded-md'>Apply Now</button>
                                     </div>
                                 </Link>
-                                :
-                                // <Link to={`/application-form/${job._id}`}>
-                                <div className='flex justify-center'>
-                                    <button className='block bg-primary text-white text-md py-2 px-12 md:px-16 rounded-md'>Apply Now</button>
-                                </div>
-                            // </Link>
-                            // <p>You already applied here</p>
                         }
                     </div>
                 </form>

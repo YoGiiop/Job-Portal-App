@@ -1,6 +1,5 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
-import { useForm, SubmitHandler } from "react-hook-form"
 import { Link, useParams } from 'react-router-dom'
 
 export const ShortlistedDetails = () => {
@@ -36,7 +35,7 @@ export const ShortlistedDetails = () => {
             fetch(`${process.env.REACT_APP_API_URL}/application/all-application/`)
             .then((res) => res.json())
             .then((data) => {
-                const filterData = data.filter(item => item.candidateID === candidate_id); 
+                const filterData = data.filter(item => item.candidateID === candidate_id && item.jobID === job_id); 
                 setApplicaton(filterData[0]);
                 console.log(filterData[0]);
             })
