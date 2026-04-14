@@ -8,7 +8,7 @@ export const FeaturedJobs = () => {
     const [jobs, setJobs] = useState([]);
 
     useEffect(() => {
-        console.log("hello");
+        // console.log("hello");
         fetch(`${process.env.REACT_APP_API_URL}/jobs/all-jobs`).then(res => res.json()).then(
             data => setJobs(data)
         );

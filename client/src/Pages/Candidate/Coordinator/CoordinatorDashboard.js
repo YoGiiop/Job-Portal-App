@@ -32,7 +32,7 @@ export const CoordinatorDashboard = () => {
             })
 
         } catch (error) {
-            console.log(error);
+            // console.log(error);
         }
     }, []);
 
@@ -98,7 +98,7 @@ export const CoordinatorDashboard = () => {
 
 function RenderTableRows({ job, recruiters, assignedRecruitersByJob }) {
     // console.log("called");
-    console.log(recruiters);
+    // console.log(recruiters);
 
     const tableDataCss = "border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4"
     return (

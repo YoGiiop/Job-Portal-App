@@ -15,7 +15,7 @@ export const Login = () => {
     } = useForm()
 
     const onSubmit = async (data) => {
-        console.log(data)
+        // console.log(data)
         // send data to backend API
         fetch(`${process.env.REACT_APP_API_URL}/auth/login`, {
             method: "POST",
@@ -24,7 +24,7 @@ export const Login = () => {
         })
             .then((res) => res.json())
             .then((result) => {
-                console.log(result);
+                // console.log(result);
                 if (result.success) {
                     localStorage.setItem("usertoken", result.token)
                     localStorage.setItem("user", JSON.stringify(result.user));
@@ -39,7 +39,7 @@ export const Login = () => {
             })
             .catch((err) => {
                 toast.error("An error occured")
-                console.log(err);
+                // console.log(err);
             })
     }
 

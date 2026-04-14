@@ -31,7 +31,7 @@ export const AssignRecruiter = () => {
                 const recruiterData = userData.filter((user) => user.isAssigned === false && user.role === "recruiter");
                 setRecruiters(recruiterData);
             } catch (error) {
-                console.log(error);
+                // console.log(error);
             }
         };
 
@@ -59,7 +59,7 @@ export const AssignRecruiter = () => {
             });
 
             const result = await response.json();
-            console.log(result);
+            // console.log(result);
 
             if (!response.ok) {
                 alert(result.message || "Failed to assign recruiter");
@@ -68,7 +68,7 @@ export const AssignRecruiter = () => {
 
             alert("Recruiter assigned successfully");
         } catch (error) {
-            console.log(error);
+            // console.log(error);
             alert("Something went wrong while assigning recruiter");
         }
     }

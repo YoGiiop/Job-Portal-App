@@ -61,7 +61,7 @@ export const MyJobs = () => {
 
                 setApplications(normalizedApplications);
             } catch (error) {
-                console.log(error);
+                // console.log(error);
             }
         };
 

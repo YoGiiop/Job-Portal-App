@@ -40,12 +40,12 @@ export const JobDetails = () => {
         const user = JSON.parse(token);
         const normalizedUser = Array.isArray(user) ? user[0] : user;
         setLoginData(normalizedUser)
-        console.log(user);
+        // console.log(user);
     }, [])
 
     useEffect(() => {
         fetch(`${process.env.REACT_APP_API_URL}/jobs/current-job/${id}`).then(res => res.json()).then(
-            data => { setJob(data); console.log(data); }
+            data => { setJob(data); /* console.log(data); */ }
         )
     }
         , []);
@@ -65,7 +65,7 @@ export const JobDetails = () => {
                     });
 
                     setApplicants(filteredApplicants);
-                    console.log(filteredApplicants);
+                    // console.log(filteredApplicants);
                     // console.log(jobs.applicants);
                 } catch (error) {
                     console.error('Error fetching applicants data:', error);

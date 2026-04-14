@@ -82,7 +82,7 @@ export const CandidateProfile = () => {
         setJob(jobData);
         setApplicaton(candidateApplication);
       } catch (error) {
-        console.log(error);
+        // console.log(error);
       } finally {
         setLoading(false);
       }
@@ -114,7 +114,7 @@ export const CandidateProfile = () => {
     })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
+        // console.log(result);
         window.location.href = '/recruiter/review';
       });
   };

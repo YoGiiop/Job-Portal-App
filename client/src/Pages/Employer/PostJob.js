@@ -41,7 +41,7 @@ export const PostJob = () => {
             toast.success("Job Posted Successfully");
             window.location.href = '/all-jobs';
         } catch (error) {
-            console.log(error);
+            // console.log(error);
             toast.error("Failed to post job");
         }
     }

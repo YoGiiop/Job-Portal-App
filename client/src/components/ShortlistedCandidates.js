@@ -42,7 +42,7 @@ export const ShortlistedCandidates = () => {
 
                 setShortlistedRows(rows);
             } catch (error) {
-                console.log(error);
+                // console.log(error);
             }
         };
 

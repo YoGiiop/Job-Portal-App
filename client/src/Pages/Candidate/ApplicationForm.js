@@ -72,7 +72,7 @@ export const ApplicationForm = () => {
                 navigate('/my-jobs');
             }, 800);
         } catch (error) {
-            console.log(error);
+            // console.log(error);
             toast.error("Failed to apply to job");
         }
     };
@@ -81,7 +81,7 @@ export const ApplicationForm = () => {
         try {
             fetch(`${process.env.REACT_APP_API_URL}/jobs/current-job/${id}`).then((res) => res.json()).then((data) => setJob(data))
         } catch (error) {
-            console.log(error);
+            // console.log(error);
         }
     }, [id]);
 

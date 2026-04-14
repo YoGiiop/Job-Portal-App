@@ -49,7 +49,7 @@ export const UpdateJob = () => {
                 setQuestionSize(Math.max(questionList.length - 1, 0));
             })
             .catch((error) => {
-                console.log(error);
+                // console.log(error);
                 toast.error('Failed to load job details');
             });
     }, [id, reset]);
@@ -71,7 +71,7 @@ export const UpdateJob = () => {
                 toast.error(result?.message || "Failed to update job");
             })
             .catch((error) => {
-                console.log(error);
+                // console.log(error);
                 toast.error("Failed to update job");
             });
     };
