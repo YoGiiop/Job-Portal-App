@@ -11,8 +11,6 @@ export const ShortlistedDetails = () => {
     const [job, setJob] = useState();
 
     useEffect(() => {
-        console.log(candidate_id);
-        console.log(job_id);
         try {
             fetch(`${process.env.REACT_APP_API_URL}/users/user/${candidate_id}`)
             .then((res) => res.json())
@@ -28,7 +26,7 @@ export const ShortlistedDetails = () => {
         } catch (error) {
             console.log(error);
         }
-    }, []);
+    }, [candidate_id, job_id]);
 
     useEffect(() => {
         try {
@@ -37,16 +35,15 @@ export const ShortlistedDetails = () => {
             .then((data) => {
                 const filterData = data.filter(item => item.candidateID === candidate_id && item.jobID === job_id); 
                 setApplicaton(filterData[0]);
-                console.log(filterData[0]);
             })
         } catch (error) {
             console.log(error);
         }
-    }, []);
+    }, [candidate_id, job_id]);
     
     return (
-        <div className='max-w-scren-2xl w-full md:w-4/6 lg:w-1/2 container mt-2 mx-auto xl:px-24 px-4 '>
-            <div className=' bg-[#e7e7e7] mx-auto py-6 px-6 md:px-16 rounded-lg'>
+        <div className='container mx-auto mt-2 w-full max-w-screen-lg px-4 sm:px-6 xl:px-24'>
+            <div className='mx-auto rounded-2xl bg-[#e7e7e7] px-4 py-6 sm:px-6 md:px-12'>
 
                 {/* FORM */}
 

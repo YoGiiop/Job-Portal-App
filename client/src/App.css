@@ -3,22 +3,36 @@
 @tailwind utilities;
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,100;9..40,200;9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800;9..40,900;9..40,1000&display=swap');
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
 body{
+  margin: 0;
   font-family: 'DM Sans', sans-serif;
+  color: #141414;
+  background: #f8fafc;
 }
 
 .active{
   color: #087658;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 a {
   text-decoration: none;
-  /* color: rgb(97, 97, 97);   */
+  color: inherit;
 }
 
 li {
   list-style: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
 }
 
 .btns {
@@ -35,10 +49,20 @@ li {
 /* jobs page */
 
 .card {
-  margin: 20px;
-  border: 2px solid #ededed;
-  padding: 20px;
+  margin: 0;
+  padding: 1rem;
+  border-radius: 1rem;
+  background: #ffffff;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
 }
 
 
@@ -153,7 +177,7 @@ li {
 }
 
 .create-job-input{
-  @apply block w-full bg-white py-1.5 pl-3 text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-sm sm:leading-6
+  @apply block w-full rounded-lg border border-gray-200 bg-white px-3 py-2 text-gray-900 placeholder:text-gray-400 shadow-sm focus:outline-none sm:text-sm sm:leading-6;
 }
 
 /* Table CSS */

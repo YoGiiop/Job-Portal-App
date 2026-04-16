@@ -30,26 +30,24 @@ export const OurCompanies = () => {
   ]
 
   return (
-    <div className="mt-56">
-      <h1 className='text-center text-xl md:text-2xl font-bold text-primary mt-12 md:mt-6 my-6 md:my-12'>Our Trusted Partners</h1>
+    <div className="mt-12 md:mt-16 lg:mt-20">
+      <h1 className='my-6 text-center text-xl font-bold text-primary md:my-10 md:text-2xl lg:text-3xl'>Our Trusted Partners</h1>
             
 
-      <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 justify-items-center items-center gap-4">
+      <ul className="grid grid-cols-2 items-center justify-items-center gap-4 sm:grid-cols-3 lg:grid-cols-6 lg:gap-5">
         {companyLogos.map((obj) => (
           <li
-            className=""
+            className="w-full"
             key={obj.id}
           >
-            <div className="flex flex-col items-center justify-center">
+            <div className="flex min-h-[88px] items-center justify-center rounded-2xl border border-gray-200 bg-white px-4 py-4 shadow-sm">
               <img
                 src={obj.logo}
                 width={70}
                 height={10}
-                alt={obj.logo}
-                class="transform hover:scale-110 transition duration-300 ease-in-out"
+                alt="Company logo"
+                className="h-10 w-auto object-contain transition duration-300 ease-in-out hover:scale-105"
               />
-
-              <h3 className="m-2 font-bold">{obj.title}</h3>
             </div>
           </li>
         ))}

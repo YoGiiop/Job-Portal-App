@@ -33,40 +33,41 @@ function App() {
   // const navigate = useNavigate();
 
   return (
-    <div className="App">
-      <Routes>
-        {/* <h1 className='text-5xl text-green-600 '>Hello</h1> */}
-        <Route path="/" element={<Navbar />}>
-          <Route path="/" element={<Home />} />
-          <Route path="*" element={<Home />} />
-          <Route path="/post-job" element={<PostJob />} />
-          <Route path="/all-jobs" element={<AllJobs />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Register />} />
+    <div className="App flex min-h-screen flex-col bg-slate-50">
+      <div className="flex-1">
+        <Routes>
+          {/* <h1 className='text-5xl text-green-600 '>Hello</h1> */}
+          <Route path="/" element={<Navbar />}>
+            <Route path="/" element={<Home />} />
+            <Route path="*" element={<Home />} />
+            <Route path="/post-job" element={<PostJob />} />
+            <Route path="/all-jobs" element={<AllJobs />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Register />} />
 
-          {/* <Route path='/job-detail' element={<JobDetails />}/> */}
-          <Route path="/current-job/:id" element={<JobDetails />} />
-          <Route path="/application-form/:id" element={<ApplicationForm />} />
-          <Route path="/candidate/:id" element={<CandidateProfile />} />
-          <Route path="/shortlist" element={<ShortlistedCandidates />} />
-          <Route
-            path="/shortlist/details/:candidate_id/:job_id"
-            element={<ShortlistedDetails />}
-          />
-          <Route path="/assign-recruiter/:id" element={<AssignRecruiter />} />
+            {/* <Route path='/job-detail' element={<JobDetails />}/> */}
+            <Route path="/current-job/:id" element={<JobDetails />} />
+            <Route path="/application-form/:id" element={<ApplicationForm />} />
+            <Route path="/candidate/:id" element={<CandidateProfile />} />
+            <Route path="/shortlist" element={<ShortlistedCandidates />} />
+            <Route
+              path="/shortlist/details/:candidate_id/:job_id"
+              element={<ShortlistedDetails />}
+            />
+            <Route path="/assign-recruiter/:id" element={<AssignRecruiter />} />
 
-          <Route path="/recruiter/review" element={<RecruiterDashboard />} />
-          {/* <Route path='/recruiter/review' element={<RecruiterDashboard />}/> */}
-          <Route
-            path="/coordinator/review"
-            element={<CoordinatorDashboard />}
-          />
-          <Route path="/all-posted-jobs" element={<AllPostedJobs />} />
-          <Route path="/update-job/:id" element={<UpdateJob />} />
-          <Route path="/my-jobs/" element={<MyJobs />} />
-        </Route>
-      </Routes>
-
+            <Route path="/recruiter/review" element={<RecruiterDashboard />} />
+            {/* <Route path='/recruiter/review' element={<RecruiterDashboard />}/> */}
+            <Route
+              path="/coordinator/review"
+              element={<CoordinatorDashboard />}
+            />
+            <Route path="/all-posted-jobs" element={<AllPostedJobs />} />
+            <Route path="/update-job/:id" element={<UpdateJob />} />
+            <Route path="/my-jobs/" element={<MyJobs />} />
+          </Route>
+        </Routes>
+      </div>
       <Footer />
     </div>
   );

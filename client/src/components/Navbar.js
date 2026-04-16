@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { Outlet, NavLink, Link, useNavigate } from "react-router-dom";
+import { Outlet, NavLink, Link, useLocation, useNavigate } from "react-router-dom";
 import { LoginContext } from "./ContextProvider/Context";
 import "boxicons";
 import logoURL from "../assets/img/logo.jpeg";
@@ -30,6 +30,7 @@ export function Navbar() {
 
   const { loginData, setLoginData, setUserRole } = useContext(LoginContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [navItems, setNavItems] = useState([
     { label: "Home", path: "/" },
@@ -38,6 +39,10 @@ export function Navbar() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const handlerIsMenuOpen = () => setIsMenuOpen(!isMenuOpen);
+
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (loginData?.role) {
@@ -75,6 +80,7 @@ export function Navbar() {
         if (result.success) {
           setLoginData(null);
           setUserRole(null);
+          setIsMenuOpen(false);
           localStorage.removeItem("usertoken");
           localStorage.removeItem("user");
           navigate("/");
@@ -83,12 +89,12 @@ export function Navbar() {
   };
 
   return (
-    <div className="max-w-screen container mx-auto xl:px-24 px-4">
-      <nav className="flex justify-between items-center py-6">
+    <div className="mx-auto w-full max-w-screen-2xl px-4 sm:px-6 lg:px-10 xl:px-16 2xl:px-24">
+      <nav className="flex items-center justify-between gap-4 py-5 md:py-6">
         {/* BRAND */}
         <NavLink
           to="/"
-          className="flex items-center gap-2 text-2xl text-[#087658]"
+          className="flex min-w-0 items-center gap-3 text-[#087658]"
         >
           {/* <a
             href="/"
@@ -96,16 +102,16 @@ export function Navbar() {
           > */}
           <img
             src={logoURL}
-            className="rounded-full h-12 md:h-16"
-            alt="Flowbite Logo"
+            className="h-11 w-11 rounded-full object-cover md:h-14 md:w-14"
+            alt="HireFlow logo"
           />
           {/* </a> */}
-          <span className="font-extrabold text-xl md:text-3xl">HireFlow</span>
+          <span className="truncate font-extrabold text-lg sm:text-xl md:text-3xl">HireFlow</span>
         </NavLink>
 
         {/* MAIN MENU - Lg device */}
         {navItems && (
-          <ul className="hidden md:flex gap-12 font-bold">
+          <ul className="hidden md:flex items-center gap-6 font-bold lg:gap-8 xl:gap-10">
             {navItems.map(({ label, path }) => (
               <li key={path} className="text-base text-primary">
                 <NavLink
@@ -119,30 +125,31 @@ export function Navbar() {
           </ul>
         )}
 
-        <div>
+        <div className="hidden md:block">
           {localStorage.getItem("usertoken") ? (
-            <div className="hidden md:block">
-              <div className="grid grid-cols-2 items-center gap-4">
+            <div className="flex items-center gap-4 text-sm lg:text-base">
+              <span className="max-w-[180px] truncate font-medium text-primary">
                 Hello, {loginData && loginData.userName}
-                <div
+              </span>
+              <button
+                  type="button"
                   onClick={logoutHandler}
-                  className="py-2 px-5 text-center border-2 bg-gray-200 cursor-pointer rounded"
+                  className="rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 font-medium text-primary transition hover:bg-gray-200"
                 >
                   Logout
-                </div>
-              </div>
+                </button>
             </div>
           ) : (
-            <div className="text-base text-primary font-medium space-x-5 hidden md:block">
+            <div className="flex items-center gap-3 text-base font-medium text-primary">
               <Link
                 to="/login"
-                className="py-2 px-5 border rounded bg-gray-100"
+                className="rounded-lg border border-gray-300 bg-gray-100 px-4 py-2"
               >
                 Login
               </Link>
               <Link
                 to="/signup"
-                className="bg-secondary text-white py-2 px-5 border rounded"
+                className="rounded-lg border border-secondary bg-secondary px-4 py-2 text-white"
               >
                 Sign Up
               </Link>
@@ -151,60 +158,68 @@ export function Navbar() {
         </div>
 
         {/* HAMBURGER MENU */}
-        <div className="text-primary md:hidden flex justify-end items-center gap-2">
+        <button
+          type="button"
+          onClick={handlerIsMenuOpen}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white text-primary shadow-sm md:hidden"
+          aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+        >
           <box-icon
             name={isMenuOpen ? "x" : "menu"}
             size="md"
-            color="text-primary"
-            onClick={handlerIsMenuOpen}
+            color="#141414"
           ></box-icon>
-        </div>
+        </button>
       </nav>
 
       {/* MAIN MENU sm device */}
-      <div
-        className={` ${
-          isMenuOpen ? "" : "hidden"
-        } font-bold px-4 bg-gray-200 py-5 rounded`}
-      >
-        <ul className="md:hidden sm:flex flex-col">
-          {isMenuOpen &&
-            navItems.map(({ label, path }) => (
-              <li
-                key={path}
-                className="text-base text-primary first:text-black py-1"
-              >
+      <div className={`${isMenuOpen ? "block" : "hidden"} pb-4 md:hidden`}>
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 shadow-lg">
+          <ul className="flex flex-col gap-2 font-bold">
+            {navItems.map(({ label, path }) => (
+              <li key={path} className="text-base text-primary">
                 <NavLink
                   to={path}
-                  className={({ isActive }) => (isActive ? "active" : "")}
+                  className={({ isActive }) => `block rounded-lg px-3 py-2 ${isActive ? "active bg-secondary/5" : ""}`}
                 >
-                  <span onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                    {label}
-                  </span>
+                  {label}
                 </NavLink>
               </li>
             ))}
-          {/* Login/signup sm-device */}
-          <div>
+          </ul>
+
+          <div className="mt-4 border-t border-gray-200 pt-4">
             {localStorage.getItem("usertoken") ? (
-              <div>
-                Hello, {loginData.userName}
-                <div
+              <div className="flex flex-col gap-3">
+                <span className="text-sm font-medium text-primary">
+                  Hello, {loginData?.userName}
+                </span>
+                <button
+                  type="button"
                   onClick={logoutHandler}
-                  className="py-2 px-5 border rounded"
+                  className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-left font-medium text-primary"
                 >
                   Logout
-                </div>
+                </button>
               </div>
             ) : (
-              <li onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                <Link to="/login" className="py-1 text-primary">
+              <div className="flex flex-col gap-3 text-sm font-medium">
+                <Link
+                  to="/login"
+                  className="w-full rounded-lg border border-gray-300 bg-gray-100 px-4 py-2 text-primary"
+                >
                   Login
                 </Link>
-              </li>
+                <Link
+                  to="/signup"
+                  className="w-full rounded-lg border border-secondary bg-secondary px-4 py-2 text-white"
+                >
+                  Sign Up
+                </Link>
+              </div>
             )}
           </div>
-        </ul>
+        </div>
       </div>
 
       <Outlet />

@@ -86,8 +86,8 @@ export const ApplicationForm = () => {
     }, [id]);
 
     return (
-        <div className='max-w-scren-2xl w-full md:w-4/6 lg:w-1/2 container mt-2 mx-auto xl:px-24 px-4 '>
-            <div className=' bg-[#e7e7e7] mx-auto py-6 px-6 md:px-16 rounded-lg'>
+        <div className='container mx-auto mt-2 w-full max-w-screen-lg px-4 sm:px-6 xl:px-24'>
+            <div className='mx-auto rounded-2xl bg-[#e7e7e7] px-4 py-6 sm:px-6 md:px-12'>
 
                 {/* FORM */}
                 <form onSubmit={handleSubmit(onSubmit)} >
@@ -104,17 +104,19 @@ export const ApplicationForm = () => {
                             {/* {job.applicationForm.question.map((question, index) => (
                                 <RenderQuestion key={index} question={question} />
                             ))} */}
-                            {job.applicationForm && job.applicationForm.question.map((question, index) => (
+                            {job.applicationForm?.question?.length > 0 ? job.applicationForm.question.map((question, index) => (
                                 <RenderQuestion key={index} index={index} question={question} register={register} />
 
-                            ))}
+                            )) : (
+                                <p className='mt-4 text-sm text-gray-600'>No application questions were configured for this job.</p>
+                            )}
 
                         </div>
 
                     </div>
 
-                    <div className='flex justify-center my-8'>
-                        <button className='submit submit-btn block bg-primary text-white text-md py-3 px-16 rounded-md'>Submit</button>
+                    <div className='my-8 flex justify-center'>
+                        <button className='submit submit-btn block w-full rounded-md bg-primary px-16 py-3 text-md text-white sm:w-auto'>Submit</button>
                     </div>
                 </form>
             </div>
@@ -124,8 +126,8 @@ export const ApplicationForm = () => {
 
 function RenderQuestion({ index, question, register }) {
     return (
-        <div className='grid grid-cols-1 md:grid-cols-2 items-center pt-2 md:my-0'>
-            <label className='block mt-2 m-1 text-sm' >{index + 1}. {question}</label>
+        <div className='grid grid-cols-1 gap-2 pt-3 md:grid-cols-2 md:items-center'>
+            <label className='m-1 mt-2 block text-sm leading-6'>{index + 1}. {question}</label>
             <input type='hidden' value={question} {...register(`applicationForm.${index}.question`)} />
             <div>
                 <input

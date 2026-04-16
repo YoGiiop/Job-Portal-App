@@ -9,7 +9,6 @@ export const JobDetails = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors },
     } = useForm({
         defaultValues: {
             candidateID: "",
@@ -30,7 +29,6 @@ export const JobDetails = () => {
     const randomNum = Math.floor(Math.random() * (200 - 20 + 1) + 20)
     const { id } = useParams();
     const [job, setJob] = useState();
-    const [applicants, setApplicants] = useState();
     const [file, setFile] = useState();
 
     const [loginData, setLoginData] = useState();
@@ -48,40 +46,19 @@ export const JobDetails = () => {
             data => { setJob(data); /* console.log(data); */ }
         )
     }
-        , []);
-
-    useEffect(() => {
-        if (job && job.applicants && job.applicants.length > 0) {
-            const fetchApplicantsData = async () => {
-                try {
-                    const response = await fetch(`${process.env.REACT_APP_API_URL}/users/all-users`);
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch applicants data');
-                    }
-                    const data = await response.json();
-
-                    const filteredApplicants = data.filter(app => {
-                        return job.applicants.some(jobApplicant => jobApplicant.applicant === app._id);
-                    });
-
-                    setApplicants(filteredApplicants);
-                    // console.log(filteredApplicants);
-                    // console.log(jobs.applicants);
-                } catch (error) {
-                    console.error('Error fetching applicants data:', error);
-                }
-            };
-
-            fetchApplicantsData();
-        }
-    }, [job]);
+        , [id]);
 
     const handleFileUpload = (e) => {
-        const file = e.target.files[0];
-        setFile(file.name);
+        const selectedFile = e.target.files?.[0];
+
+        if (!selectedFile || !loginData?._id) {
+            return;
+        }
+
+        setFile(selectedFile.name);
         const formData = new FormData();
-        formData.append("resume", file);
-        fetch(`${process.env.REACT_APP_API_URL}/upload/resume/${applicants._id}`, {
+        formData.append("resume", selectedFile);
+        fetch(`${process.env.REACT_APP_API_URL}/upload/resume/${loginData._id}`, {
             method: "POST",
             body: formData,
         })
@@ -100,9 +77,9 @@ export const JobDetails = () => {
         : false;
 
     return (
-        <div className='max-w-scren-2xl  w-full md:w-5/6 lg:w-6/8 container mt-2 mx-auto xl:px-24 px-4 '>
+        <div className='container mx-auto mt-2 w-full max-w-screen-xl px-4 sm:px-6 xl:px-24'>
 
-            <div className=' bg-[#efefef] mx-auto py-12 md:px-14 px-8 rounded-lg'>
+            <div className='mx-auto rounded-2xl bg-[#efefef] px-4 py-8 sm:px-6 md:px-10 md:py-12 lg:px-14'>
 
                 <div className='flex flex-col lg:flex-row  gap-8'>
 
@@ -112,9 +89,9 @@ export const JobDetails = () => {
                         <div className='w-full'>
 
                             {/* BASIC DETAILS */}
-                            <div className='flex items-center flex-wrap justify-center md:justify-normal'>
+                            <div className='flex flex-wrap items-center justify-center gap-4 md:justify-start'>
                                 <img src={LogoURL} alt="Logo" className="rounded-full w-20 md:w-24 h-auto" />
-                                <div className='mx-4 my-3 text-center md:text-left md:my-0'>
+                                <div className='my-3 text-center md:my-0 md:text-left'>
                                     <h1 className='text-xl md:text-2xl font-bold'>{job.jobTitle}</h1>
                                     <p className='text-secondary'>Hireflow.com</p>
                                     <p className='text-sm text-gray-700'>Posted - 19/06/2024</p>
@@ -122,7 +99,7 @@ export const JobDetails = () => {
                             </div>
 
                             {/* ADDITIONALS */}
-                            <div className='my-4 gap-2 grid grid-cols-2 sm:grid-cols-4'>
+                            <div className='my-4 grid grid-cols-2 gap-3 xl:grid-cols-4'>
                                 <div className='bg-blue-300 rounded-lg py-4 md:py-5 text-center'>
                                     <h2 className='text-xs md:text-md font-semibold text-gray-700'>Job Type</h2><p className='text-sm md:text-lg font-bold'>{job.employmentType}</p>
                                 </div>
@@ -151,22 +128,22 @@ export const JobDetails = () => {
                 {/* Submit button */}
                 <form className='mt-8' onSubmit={handleSubmit(onSubmit)}>
                     <h2 className=' font-bold my-4'>Upload Resume to Apply<span className=' text-red-600'>*</span></h2>
-                    <div className='px-2 grid grid-cols-1 md:grid-cols-2 items-center justify-items-center gap-4'>
+                    <div className='grid grid-cols-1 items-center gap-4 px-2 lg:grid-cols-[minmax(0,1fr)_auto]'>
 
-                        <div className='w-full md:w-5/6'>
-                            <label class="sr-only">Choose file</label>
-                            <input type="file" onChange={handleFileUpload} {...register("resume")} id="file-input" class="block w-full cursor-pointer border border-primary shadow-sm rounded-lg text-sm focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none file:bg-primary file:text-white file:border-0 file:me-4 file:py-2 file:px-3" />
+                        <div className='w-full'>
+                            <label className="sr-only">Choose file</label>
+                            <input type="file" onChange={handleFileUpload} {...register("resume")} id="file-input" className="block w-full cursor-pointer rounded-lg border border-primary text-sm shadow-sm file:me-4 file:border-0 file:bg-primary file:px-3 file:py-2 file:text-white focus:z-10 focus:border-blue-500 focus:ring-blue-500 disabled:pointer-events-none disabled:opacity-50" />
                         </div>
 
                         {
                             job && isAlreadyApplied ?
-                                <div className='flex justify-center'>
-                                    <button type='button' disabled className='block bg-gray-500 text-white text-md py-2 px-12 md:px-16 rounded-md'>Already Applied</button>
+                                <div className='flex w-full justify-center lg:w-auto'>
+                                    <button type='button' disabled className='block w-full rounded-md bg-gray-500 px-8 py-3 text-md text-white sm:w-auto md:px-16'>Already Applied</button>
                                 </div>
                                 :
-                                <Link to={`/application-form/${job?._id}`}>
-                                    <div className='flex justify-center'>
-                                        <button type='button' className='block bg-primary text-white text-md py-2 px-12 md:px-16 rounded-md'>Apply Now</button>
+                                <Link to={`/application-form/${job?._id}`} className='w-full lg:w-auto'>
+                                    <div className='flex w-full justify-center'>
+                                        <button type='button' className='block w-full rounded-md bg-primary px-8 py-3 text-md text-white sm:w-auto md:px-16'>Apply Now</button>
                                     </div>
                                 </Link>
                         }

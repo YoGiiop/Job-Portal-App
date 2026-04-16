@@ -87,8 +87,8 @@ export const MyJobs = () => {
                                     </div>
                                 </div>
 
-                                <div className="block w-full overflow-x-hidden">
-                                    <table className="items-center bg-transparent w-full border-collapse ">
+                                <div className="block w-full overflow-x-auto">
+                                    <table className="items-center bg-transparent w-full min-w-[640px] border-collapse">
                                         <thead>
                                             <tr>
                                                 <th className={tableHeaderCss}>Job Role</th>
@@ -135,7 +135,7 @@ function RenderTableRows({application}){
             <td className={`${tableDataCss} hidden md:table-cell`}>
                 {application.location}
             </td>
-            <td className={`${tableDataCss} font-bold hidden md:table-cell`}>
+            <td className={`${tableDataCss} font-bold`}>
                 {application.status}
             </td>
             

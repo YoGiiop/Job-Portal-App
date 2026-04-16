@@ -41,8 +41,8 @@ export const AllJobs = () => {
                                     </div>
                                 </div>
 
-                                <div className="block w-full overflow-x-hidden">
-                                    <table className="items-center bg-transparent w-full border-collapse ">
+                                <div className="block w-full overflow-x-auto">
+                                    <table className="items-center bg-transparent w-full min-w-[640px] border-collapse">
                                         <thead>
                                             <tr>
                                                 <th className={tableHeaderCss}>Job Title</th>
